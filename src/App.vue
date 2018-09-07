@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-   hello world !!!
+   hello world   !!!
   </div>
 </template>
 
@@ -11,8 +11,9 @@ export default {
 </script>
 
 <style>
-@import "common/styles/variable.styl"
+@import "common/stylus/variable.styl"
 #app {
-  color-background: red;
+  color:red;
 }
+
 </style>
