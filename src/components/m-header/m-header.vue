@@ -20,6 +20,7 @@ export default {
     color: $color-theme
     font-size: 24px
     .icon
+      border-radius: 14px
       display: inline-block
       vertical-align: top
       margin-top: 6px
