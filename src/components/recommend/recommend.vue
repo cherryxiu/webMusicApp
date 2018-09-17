@@ -1,20 +1,21 @@
 <template>
   <div class="recommend" ref="recommend">
-    <scroll ref="scroll" class="recommend-content" :data="discList">
+    recommend
+  <!-- <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
-        <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
+        &lt;!&ndash;<div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
           <slider>
-           <!-- <div v-for="item in recommends">
+            <div v-for="item in recommends" v-bind:key="item">
               <a :href="item.linkUrl">
                 <img class="needsclick" @load="loadImage" :src="item.picUrl">
               </a>
-            </div>-->
+            </div>
           </slider>
-        </div>
+        </div>&ndash;&gt;
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <!--<li @click="selectItem(item)" v-for="item in discList" class="item">
+            &lt;!&ndash;<li @click="selectItem(item)" v-for="item in discList" class="item">
               <div class="icon">
                 <img width="60" height="60" v-lazy="item.imgurl">
               </div>
@@ -22,20 +23,35 @@
                 <h2 class="name" v-html="item.creator.name"></h2>
                 <p class="desc" v-html="item.dissname"></p>
               </div>
-            </li>-->
+            </li>&ndash;&gt;
           </ul>
         </div>
       </div>
       <div class="loading-container" v-show="!discList.length">
         <loading></loading>
       </div>
-    </scroll>
+    </scroll>-->
     <router-view></router-view>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+import {getRecommend} from 'api/recommend'
+import {ERR_OK} from 'api/config'
+
 export default {
+  created () {
+    this._getRecommend()
+  },
+  methods: {
+    _getRecommend () {
+      getRecommend().then((res) => {
+        if (res.code === ERR_OK) {
+          console.log(res.data.slider)
+        }
+      })
+    }
+  }
 }
 </script>
 
