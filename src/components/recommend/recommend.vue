@@ -23,7 +23,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import Slider from 'base/slider/slider'
+import Slider from '../../base/slider/slider'
 import {getRecommend} from 'api/recommend'
 import {ERR_OK} from 'api/config'
 
