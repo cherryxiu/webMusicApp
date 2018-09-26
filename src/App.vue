@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    hehehello
       <m-header></m-header>
       <router-view></router-view>
       <tab></tab>
