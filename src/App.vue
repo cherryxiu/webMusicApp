@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    hehe
+    hehehello
       <m-header></m-header>
       <router-view></router-view>
       <tab></tab>
