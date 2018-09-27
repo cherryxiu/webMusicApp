@@ -57,9 +57,9 @@ export default {
     },
     _getDiscList () {
       getDiscList().then((res) => {
-        if (res.code === ERR_OK) {
+        /* if (res.code === ERR_OK) {
           this.discList = res.data.list
-        }
+        } */
       })
     }
   },
@@ -113,9 +113,4 @@ export default {
               color: $color-text
             .desc
               color: $color-text-d
-      .loading-container
-        position: absolute
-        width: 100%
-        top: 50%
-        transform: translateY(-50%)
 </style>
