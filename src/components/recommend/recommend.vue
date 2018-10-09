@@ -1,22 +1,22 @@
 <template>
   <div class="recommend" ref="recommend">
-    <div class="recommend-content">
-      <div v-if="recommends.length" class="slider-wrapper">
-        <slider>
-          <div v-for="(item,index) in recommends" v-bind:key="index">
-            <a :href="item.linkUrl">
-              <img :src="item.picUrl">
-            </a>
-          </div>
-        </slider>
-      </div>
+    <scroll  ref="scroll" class="recommend-content" :data="discList">
       <div>
+        <div v-if="recommends.length" class="slider-wrapper">
+          <slider>
+            <div v-for="(item,index) in recommends" v-bind:key="index">
+              <a :href="item.linkUrl">
+                <img :src="item.picUrl">
+              </a>
+            </div>
+          </slider>
+        </div>
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐 </h1>
           <ul>
             <li @click="selectItem(item)" v-for="(item, index) in discList" v-bind:key="index" class="item">
               <div class="icon">
-                <img width="60" height="60" v-lazy="item.imgurl">
+                <img width="60" height="60" :src="item.imgurl">
               </div>
               <div class="text">
                 <h2 class="name" v-html="item.creator.name"></h2>
@@ -26,12 +26,12 @@
           </ul>
         </div>
       </div>
-    </div>
-    <router-view></router-view>
+    </scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+import Scroll from '../../base/scroll/scroll'
 import Slider from '../../base/slider/slider'
 import {getRecommend, getDiscList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
@@ -64,7 +64,8 @@ export default {
     }
   },
   components: {
-    Slider
+    Slider,
+    Scroll
   }
 }
 </script>
