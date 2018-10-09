@@ -6,7 +6,7 @@
           <slider>
             <div v-for="(item,index) in recommends" v-bind:key="index">
               <a :href="item.linkUrl">
-                <img :src="item.picUrl">
+                <img @load="loadImage()" :src="item.picUrl">
               </a>
             </div>
           </slider>
@@ -61,6 +61,13 @@ export default {
           this.discList = res.data.list
         }
       })
+    },
+    loadImage () {
+      // 一旦轮播图有图片加载出来，就refresh scroll（一次就可以）
+      if (!this.checkLoaded) {
+        this.$refs.scroll.refresh()
+        this.checkLoaded = true
+      }
     }
   },
   components: {
