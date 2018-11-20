@@ -1,6 +1,6 @@
 <template>
   <div class="singer" ref="singer">
-   <!-- <list-view @select="selectSinger" :data="singers" ref="list"></list-view>-->
+    <list-view :data="singers" ref="list"></list-view>
     <router-view></router-view>
   </div>
 </template>
@@ -9,6 +9,7 @@
 import {getSingerList} from 'api/singer'
 import {ERR_OK} from 'api/config'
 import Singer from 'common/js/singer'
+import ListView from 'base/listview/listview'
 const HOT_NAME = '热门'
 const HOT_SINGER_LEN = 10
 export default {
@@ -71,6 +72,9 @@ export default {
       })
       return hot.concat(ret)// 得到一个一维数组
     }
+  },
+  components: {
+    ListView
   }
 }
 
