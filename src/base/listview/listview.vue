@@ -78,6 +78,17 @@ export default {
       this.scrollY = pos.y
     },
     _scrollTo (index) {
+      // 点击时：排除右侧字母的最上面，最下面空余的点击
+      if (!index && index !== 0) {
+        return
+      }
+      // 滑动字母列表时： 排除右侧字母的最上面，最下面空余的部分
+      if (index < 0) {
+        index = 0
+      } else if (index > this.listHeight - 2) {
+        index = this.listHeight - 2
+      }
+      this.scrollY = -this.listHeight[index]
       this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
     },
     _calculateHeight () {
@@ -176,7 +187,7 @@ export default {
       font-family: Helvetica
       .item
         padding: 3px
-        line-height: 1
+        line-height: 0.8
         color: $color-text-l
         font-size: $font-size-small
         &.current
