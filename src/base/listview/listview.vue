@@ -19,7 +19,7 @@
     </ul>
     <div class="list-shortcut" @touchstart="onshortcutTouchStart" @touchmove.stop.prevent="onshortcutTouchMove">
       <ul>
-        <li v-for="(item,index) in shortcutList" v-bind:key="index" :data-index="index" class="item">{{ item }}</li>
+        <li v-for="(item,index) in shortcutList" v-bind:key="index" :data-index="index" class="item" :class="{'current': currentIndex==index}">{{ item }}</li>
       </ul>
     </div>
   </scroll>
