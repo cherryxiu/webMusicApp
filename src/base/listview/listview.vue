@@ -10,7 +10,7 @@
       <li v-for="(group, index) in data" class="list-group" v-bind:key="index" ref="listGroup">
         <h2 class="list-group-title">{{ group.title }}</h2>
         <ul>
-          <li v-for="(item,index) in group.items" class="list-group-item" v-bind:key="index">
+          <li @click="selectItem(item)" v-for="(item,index) in group.items" class="list-group-item" v-bind:key="index">
             <img class="avatar" v-lazy="item.avatar" />
             <span class="name">{{ item.name }}</span>
           </li>
@@ -69,6 +69,10 @@ export default {
     }
   },
   methods: {
+    selectItem (item) {
+      // 只是将事件派发出去，没有任何业务相关的逻辑
+      this.$emit('select', item)
+    },
     onshortcutTouchStart (e) {
       let anchorIndex = getData(e.target, 'index')
       let firstTouch = e.touches[0]
