@@ -1,31 +1,63 @@
 <template>
   <transition name="slide">
-    <div class="singer-detail"></div>
+    <!--<div class="singer-detail"></div>-->
+    <music-list :title="title" :bg-image="bgImage" :songs="songs"></music-list>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
+import MusicList from 'components/music-list/music-list'
+import {createSong} from '../../common/js/song'
 import {mapGetters} from 'vuex'
 import {getSingerDetail} from 'api/singer'
 import {ERR_OK} from 'api/config'
 export default {
-  computed: {
+  data () {
+    return {
+      songs: []
+    }
+  },
+  computed: {// 用来监控自己定义的变量,双向绑定或者数据处理
+    title () {
+      return this.singer.name
+    },
+    bgImage () {
+      return this.singer.avatar
+    },
     ...mapGetters([
-      'singer' // 对应到getters.js的singer
+      'singer' // mutation的数据传递  对应到getters.js的singer
     ])
   },
   created () {
-    console.log(this.singer)
+    console.log('跳转的singer为=======' + JSON.stringify(this.singer))
     this._getSingerDetail()
   },
   methods: {
     _getSingerDetail () {
+      if (!this.singer.id) { // 如果没有singerId，就回跳到原本singer页
+        this.$router.push('/singer')
+        return
+      }
       getSingerDetail(this.singer.id).then((res) => {
         if (res.code === ERR_OK) {
           console.log(JSON.stringify(res))
+          this.songs = this._normalizeSongs(res.data.list)
         }
       })
+    },
+    _normalizeSongs (list) {
+      let ret = []
+      list.forEach((item) => {
+        let {musicData} = item// 对象的解构赋值
+        if (musicData.songid && musicData.albummid) {
+          ret.push(createSong(musicData))
+        }
+      })
+      return ret
     }
+  },
+  components: {
+    MusicList
   }
 }
 
