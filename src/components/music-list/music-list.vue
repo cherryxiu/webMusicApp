@@ -1,12 +1,19 @@
 <template>
 <div class="music-list">
   <h1 class="title" v-html="title"></h1>
-  <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
+  <div class="bg-image" :style="bgStyle" ref="bgImage">
+    <div class="filter">
+    </div>
+  </div>
+  <div class="song-list-wrapper">
+  <song-list :songs="songs"></song-list>
+  </div>
 </div>
 </template>
 
 <script type="text/ecmascript-6">
-export default {
+import SongList from 'base/song-list/song-list'
+export default{
   name: 'music-list',
   props: {// 子组件使用父组件的数据，需要通过子组件的 props 选项
     bgImage: {
@@ -26,6 +33,9 @@ export default {
     bgStyle () {
       return `background-image:url(${this.bgImage})`
     }
+  },
+  components: {
+    SongList
   }
 }
 </script>

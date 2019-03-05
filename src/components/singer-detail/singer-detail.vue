@@ -42,6 +42,7 @@ export default {
         if (res.code === ERR_OK) {
           console.log(JSON.stringify(res))
           this.songs = this._normalizeSongs(res.data.list)
+          console.log('解析之后的songs为' + JSON.stringify(this.songs))
         }
       })
     },
