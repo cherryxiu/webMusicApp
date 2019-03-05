@@ -5,14 +5,17 @@
     <div class="filter">
     </div>
   </div>
-  <div class="song-list-wrapper">
-  <song-list :songs="songs"></song-list>
-  </div>
+  <scroll :data="songs">
+    <div class="song-list-wrapper">
+      <song-list :songs="songs"></song-list>
+    </div>
+  </scroll>
 </div>
 </template>
 
 <script type="text/ecmascript-6">
 import SongList from 'base/song-list/song-list'
+import Scroll from 'base/scroll/scroll'
 export default{
   name: 'music-list',
   props: {// 子组件使用父组件的数据，需要通过子组件的 props 选项
@@ -35,7 +38,8 @@ export default{
     }
   },
   components: {
-    SongList
+    SongList,
+    Scroll
   }
 }
 </script>
