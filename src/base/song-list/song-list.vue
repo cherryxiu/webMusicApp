@@ -4,6 +4,7 @@
     <li  class="item" v-for="(song, index) in songs" v-bind:key="index">
       <div class="content">
         <h2 class="name">{{ song.name }}</h2>
+        <p class="desc">{{getDesc(song)}}</p>
       </div>
     </li>
   </ul>
@@ -16,6 +17,11 @@ export default {
     songs: {
       type: Array,
       default: null
+    }
+  },
+  methods: {
+    getDesc (song) {
+      return `${song.singer}·${song.album}`
     }
   }
 }
