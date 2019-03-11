@@ -5,8 +5,8 @@
     <div class="filter" ref="filter">
     </div>
   </div>
-  <!--<div class="bg-layer" ref="layer"></div>-->
-  <scroll :data="songs" class="list" ref="list">
+  <div class="bg-layer" ref="layer"></div><!-- 当scroll滑动时,也跟着移动-->
+  <scroll :probe-type="probeType" :listen-scroll="listenScroll" :data="songs" @scroll="scroll" class="list" ref="list">
     <div class="song-list-wrapper">
       <song-list :songs="songs"></song-list>
     </div>
@@ -17,6 +17,8 @@
 <script type="text/ecmascript-6">
 import SongList from 'base/song-list/song-list'
 import Scroll from 'base/scroll/scroll'
+const RESERVED_HEIGHT = 40
+
 export default{
   name: 'music-list',
   props: {// 子组件使用父组件的数据，需要通过子组件的 props 选项
@@ -33,13 +35,46 @@ export default{
       default: null
     }
   },
+  data () {
+    return {
+      scrollY: 0
+    }
+  },
   computed: {
     bgStyle () {
       return `background-image:url(${this.bgImage})`
     }
   },
+  created () {
+    this.probeType = 3
+    this.listenScroll = true // 监听滚动
+  },
   mounted () { // 钩子函数; 在所有函数执行前，我先执行了的函数
-    this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
+    this.imageHeight = this.$refs.bgImage.clientHeight // 图片的高度, 也是bg-player的最大滑动距离
+    this.minTransaltey = -this.imageHeight + RESERVED_HEIGHT
+    this.$refs.list.$el.style.top = `${this.imageHeight}px`// list列表的初始化高度
+  },
+  methods: {
+    scroll (pos) { // 获取song-list滑动的距离
+      this.scrollY = pos.y
+    }
+  },
+  watch: {
+    // 监测scrollY的变化
+    scrollY (newVal) {
+      let translateY = Math.max(this.minTransaltey, newVal)
+      let zIndex = 0
+      this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
+      if (newVal < this.minTransaltey) { // newVal<0 当往上滑动到顶时,更改图片的zIndex, padding-top, height,
+        zIndex = 10
+        this.$refs.bgImage.style.paddingTop = 0
+        this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+      } else { // newVal<0 下拉时恢复图片样式
+        this.$refs.bgImage.style.paddingTop = '70%'
+        this.$refs.bgImage.style.height = `0px`
+      }
+      this.$refs.bgImage.style.zIndex = zIndex
+    }
   },
   components: {
     SongList,
@@ -129,7 +164,6 @@ export default{
       bottom: 0
       width: 100%
       background: $color-background
-      overflow: hidden
       .song-list-wrapper
         padding: 20px 30px
       .loading-container
