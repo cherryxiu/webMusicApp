@@ -17,7 +17,11 @@
 <script type="text/ecmascript-6">
 import SongList from 'base/song-list/song-list'
 import Scroll from 'base/scroll/scroll'
+import {prefixStyle} from 'common/js/dom'
+
 const RESERVED_HEIGHT = 40
+const transform = prefixStyle('transform')
+const backdrop = prefixStyle('backdrop-filter')
 
 export default{
   name: 'music-list',
@@ -65,12 +69,16 @@ export default{
       let translateY = Math.max(this.minTransaltey, newVal)
       let zIndex = 0
       let scale = 1
-      this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
+      let blur = 0
+      this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
       const percent = Math.abs(newVal / this.imageHeight)
       if (newVal > 0) { //  newVal>0实现下滑后出现图片放大的特效
         scale = 1 + percent
         zIndex = 10
+      } else { // newVal<=0实现图片模糊的效果
+        blur = Math.min(20, percent * 20)
       }
+      this.$refs.filter.style[backdrop] = `blur(${blur}px)`
       if (newVal < this.minTransaltey) { // newVal<0 当往上滑动到顶时,更改图片的zIndex, padding-top, height,
         zIndex = 10
         this.$refs.bgImage.style.paddingTop = 0
@@ -79,7 +87,7 @@ export default{
         this.$refs.bgImage.style.paddingTop = '70%'
         this.$refs.bgImage.style.height = `0px`
       }
-      this.$refs.bgImage.style['transform'] = `scale(${scale})`
+      this.$refs.bgImage.style[transform] = `scale(${scale})`
       this.$refs.bgImage.style.zIndex = zIndex
     }
   },
