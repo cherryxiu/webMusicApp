@@ -64,7 +64,13 @@ export default{
     scrollY (newVal) {
       let translateY = Math.max(this.minTransaltey, newVal)
       let zIndex = 0
+      let scale = 1
       this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
+      const percent = Math.abs(newVal / this.imageHeight)
+      if (newVal > 0) { //  newVal>0实现下滑后出现图片放大的特效
+        scale = 1 + percent
+        zIndex = 10
+      }
       if (newVal < this.minTransaltey) { // newVal<0 当往上滑动到顶时,更改图片的zIndex, padding-top, height,
         zIndex = 10
         this.$refs.bgImage.style.paddingTop = 0
@@ -73,6 +79,7 @@ export default{
         this.$refs.bgImage.style.paddingTop = '70%'
         this.$refs.bgImage.style.height = `0px`
       }
+      this.$refs.bgImage.style['transform'] = `scale(${scale})`
       this.$refs.bgImage.style.zIndex = zIndex
     }
   },
