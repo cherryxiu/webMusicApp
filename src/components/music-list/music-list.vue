@@ -1,14 +1,25 @@
 <template>
 <div class="music-list">
+  <div class="back" @click="back">
+    <i class="icon-back"></i>
+  </div>
   <h1 class="title" v-html="title"></h1>
   <div class="bg-image" :style="bgStyle" ref="bgImage">
-    <div class="filter" ref="filter">
+    <div class="play-wrapper">
+      <div ref="playBtn" v-show="songs.length>0" class="play">
+        <i class="icon-play"></i>
+        <span class="text">随机播放全部</span>
+      </div>
     </div>
+    <div class="filter" ref="filter"></div>
   </div>
   <div class="bg-layer" ref="layer"></div><!-- 当scroll滑动时,也跟着移动-->
   <scroll :probe-type="probeType" :listen-scroll="listenScroll" :data="songs" @scroll="scroll" class="list" ref="list">
     <div class="song-list-wrapper">
       <song-list :songs="songs"></song-list>
+    </div>
+    <div v-show="!songs.length" class="loading-wrapper">
+      <loading></loading>
     </div>
   </scroll>
 </div>
@@ -18,6 +29,7 @@
 import SongList from 'base/song-list/song-list'
 import Scroll from 'base/scroll/scroll'
 import {prefixStyle} from 'common/js/dom'
+import Loading from '../../base/loading/loading'
 
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
@@ -61,6 +73,9 @@ export default{
   methods: {
     scroll (pos) { // 获取song-list滑动的距离
       this.scrollY = pos.y
+    },
+    back () {
+      this.$router.back()
     }
   },
   watch: {
@@ -83,15 +98,18 @@ export default{
         zIndex = 10
         this.$refs.bgImage.style.paddingTop = 0
         this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+        this.$refs.playBtn.style.display = 'none'
       } else { // newVal<0 下拉时恢复图片样式
         this.$refs.bgImage.style.paddingTop = '70%'
         this.$refs.bgImage.style.height = `0px`
+        this.$refs.playBtn.style.display = ''
       }
       this.$refs.bgImage.style[transform] = `scale(${scale})`
       this.$refs.bgImage.style.zIndex = zIndex
     }
   },
   components: {
+    Loading,
     SongList,
     Scroll
   }
