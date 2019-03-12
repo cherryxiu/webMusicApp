@@ -65,7 +65,7 @@ export default{
     this.probeType = 3
     this.listenScroll = true // 监听滚动
   },
-  mounted () { // 钩子函数; 在所有函数执行前，我先执行了的函数
+  mounted () { // 钩子函数, 在所有函数执行前，我先执行了的函数
     this.imageHeight = this.$refs.bgImage.clientHeight // 图片的高度, 也是bg-player的最大滑动距离
     this.minTransaltey = -this.imageHeight + RESERVED_HEIGHT
     this.$refs.list.$el.style.top = `${this.imageHeight}px`// list列表的初始化高度
