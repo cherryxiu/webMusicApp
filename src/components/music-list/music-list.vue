@@ -79,7 +79,7 @@ export default{
     }
   },
   watch: {
-    // 监测scrollY的变化
+    // 监测 scrollY 的变化
     scrollY (newVal) {
       let translateY = Math.max(this.minTransaltey, newVal)
       let zIndex = 0
