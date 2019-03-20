@@ -1,5 +1,10 @@
 <template>
   <div class="player" v-show="playlist.length>0">
+    <transition name="normal"
+                 @enter="enter"
+                 @after-enter="afterEnter"
+                 @leave="leave"
+                 @after-leave="afterLeave">
     <div class="normal-player" v-show="fullScreen">
       <div class="background">
         <img width="100%" height="100%" :src="currentSong.image"/>
@@ -12,11 +17,22 @@
         <h2 class="subtitle" v-html="currentSong.singer"></h2>
       </div>
       <div class="middle">
-
+        <div class="middle-l">
+          <div class="cd-wrapper" ref="cdWrapper">
+            <div class="cd">
+              <img class="image" :src="currentSong.image">
+            </div>
+          </div>
+          <div class="playing-lyric-wrapper">
+            <div class="playing-lyric"></div>
+          </div>
+        </div>
       </div>
       <div class="bottom">
       </div>
     </div>
+    </transition>
+    <transition>
     <div class="mini-player" v-show="!fullScreen" @click="open">
       <div class="icon">
         <img  width="40" height="40" :src="currentSong.image"/>
@@ -25,13 +41,19 @@
         <h2 class="name" v-html="currentSong.name"></h2>
         <p class="desc" v-html="currentSong.singer"></p>
       </div>
+      <div class="control"></div>
+      <div class="control"></div>
     </div>
-    <div class="control"></div>
+    </transition>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import {mapGetters, mapMutations} from 'vuex'
+import animations from 'create-keyframe-animation'
+import {prefixStyle} from 'common/js/dom'
+
+const transform = prefixStyle('transform')
 export default{
   methods: {
     back () {
@@ -39,6 +61,58 @@ export default{
     },
     open () {
       this.setFullScreen(true)
+    },
+    enter (el, done) { // 设置过渡进入完成时的组件状态
+      const {x, y, scale} = this._getPosAndScale()
+      let animation = {
+        0: {
+          transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+        },
+        60: {
+          transform: `translate3d(0, 0, 0) scale(1.1)`
+        },
+        100: {
+          transform: `translate3d(0, 0, 0) scale(1)`
+        }
+      }
+      animations.registerAnimation({
+        name: 'move',
+        animation,
+        presets: {
+          duration: 400,
+          easing: 'linear' // 匀速
+        }
+      })
+      animations.runAnimation(this.$refs.cdWrapper, 'move', done)
+    },
+    afterEnter () { // 设置过渡进入完成之后的组件状态
+      animations.unregisterAnimation('move')
+      this.$refs.cdWrapper.style.animation = ''
+    },
+    leave (el, done) { // 设置过渡离开完成时地组件状态
+      this.$refs.cdWrapper.style.transition = 'all 0.4s' // 所有转变0.4s
+      const {x, y, scale} = this._getPosAndScale()
+      this.$refs.cdWrapper.style[transform] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+      this.$refs.cdWrapper.addEventListener('transitionend', done)
+    },
+    afterLeave () { // 设置过渡离开完成之后的组件状态
+      this.$refs.cdWrapper.style.transition = ''
+      this.$refs.cdWrapper.style[transform] = ''
+    },
+    _getPosAndScale () {
+      const targetWidth = 40
+      const paddingLeft = 40
+      const paddingBottom = 30
+      const paddingTop = 80
+      const width = window.innerWidth * 0.8
+      const scale = targetWidth / width
+      const x = -(window.innerWidth / 2 - paddingLeft)
+      const y = window.innerHeight - paddingTop - width / 2 - paddingBottom
+      return {
+        x,
+        y,
+        scale
+      }
     },
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN'
