@@ -59,7 +59,7 @@
         <p class="desc" v-html="currentSong.singer"></p>
       </div>
       <div class="control">
-          <i @click="togglePlaying" :class="miniIcon"></i>
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
       </div>
       <div class="control">
         <i class="icon-playlist"></i>
