@@ -45,6 +45,7 @@
       <div class="control"></div>
     </div>
     </transition>
+    <audio ref="audio" :src="currentSong.url"><source :src="currentSong.url"></audio>
   </div>
 </template>
 
@@ -124,6 +125,13 @@ export default{
       'playlist',
       'currentSong'
     ])
+  },
+  watch: {
+    currentSong () {
+      this.$nextTick(() => {
+        this.$refs.audio.play()
+      })
+    }
   }
 }
 </script>
