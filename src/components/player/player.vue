@@ -33,13 +33,13 @@
           <div class="icon i-left">
             <i class="icon-sequence"></i>
           </div>
-          <div class="icon i-left">
+          <div class="icon i-left" :class="disableCls">
             <i @click="prev" class="icon-prev"></i>
           </div>
-          <div class="icon i-center">
+          <div class="icon i-center" :class="disableCls">
             <i @click="togglePlaying" :class="playIcon"></i>
           </div>
-          <div class="icon i-right">
+          <div class="icon i-right" :class="disableCls">
             <i @click="next" class="icon-next"></i>
           </div>
           <div class="icon i-right">
@@ -66,7 +66,7 @@
       </div>
     </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url"><source :src="currentSong.url"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 
@@ -77,6 +77,11 @@ import {prefixStyle} from 'common/js/dom'
 
 const transform = prefixStyle('transform')
 export default{
+  data () {
+    return {
+      songReady: false
+    }
+  },
   computed: {
     cdCls () { // playing改变,icdWrapper的旋转也改变
       return this.playing ? 'play' : 'play pause'
@@ -86,6 +91,9 @@ export default{
     },
     miniIcon () { // playing改变,mini-icon也改变
       return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
+    disableCls () { // 当domException时,按钮会暂时变灰,不能使用
+      return this.songReady ? '' : 'disable'
     },
     ...mapGetters([ // 这里是数组,中括号,不是大括号
       'fullScreen',
@@ -143,24 +151,38 @@ export default{
       this.setPlayingState(!this.playing)
     },
     prev () {
+      if (!this.songReady) { // 切换还没准备好.songReady该没被改成true,避免DOMException
+        return
+      }
       let index = this.currentIndex - 1
       if (index === -1) { // 如果是第一首, 就跳转到最后一首
         index = this.playlist.length - 1
       }
       this.setCurrentIndex(index)
-      if (!this.playing) { // 当前歌曲暂停时,将切换后的歌曲playing改为false[所有歌曲初始化playing为ture]
+      if (!this.playing) { // 当前歌曲暂停时,将切换后的歌曲playing重新改为true,使跳转后的歌曲icon改为play[因为跳转后的歌曲自动播放]
         this.togglePlaying()
       }
+      this.songReady = false // 完成之后恢复数据初始
     },
     next () {
+      if (!this.songReady) { // 上同,避免DOMException
+        return
+      }
       let index = this.currentIndex + 1
       if (index === this.playlist.length) { // 如果是最后一首, 就跳转到第一首
         index = 0
       }
       this.setCurrentIndex(index)
-      if (!this.playing) { // 当前歌曲暂停时,将切换后的歌曲playing改为false[所有歌曲初始化playing为ture]
+      if (!this.playing) { // 上同,使跳转后的歌曲icon改为play
         this.togglePlaying()
       }
+      this.songReady = false // 完成之后恢复数据初始
+    },
+    ready () {
+      this.songReady = true
+    },
+    error () {
+      this.songReady = true
     },
     _getPosAndScale () {
       const targetWidth = 40
