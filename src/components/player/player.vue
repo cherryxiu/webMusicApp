@@ -34,13 +34,13 @@
             <i class="icon-sequence"></i>
           </div>
           <div class="icon i-left">
-            <i class="icon-prev"></i>
+            <i @click="prev" class="icon-prev"></i>
           </div>
           <div class="icon i-center">
             <i @click="togglePlaying" :class="playIcon"></i>
           </div>
           <div class="icon i-right">
-            <i class="icon-next"></i>
+            <i @click="next" class="icon-next"></i>
           </div>
           <div class="icon i-right">
             <i class="icon icon-not-favorite"></i>
@@ -77,6 +77,24 @@ import {prefixStyle} from 'common/js/dom'
 
 const transform = prefixStyle('transform')
 export default{
+  computed: {
+    cdCls () { // playing改变,icdWrapper的旋转也改变
+      return this.playing ? 'play' : 'play pause'
+    },
+    playIcon () { // playing改变,icon也改变
+      return this.playing ? 'icon-pause' : 'icon-play'
+    },
+    miniIcon () { // playing改变,mini-icon也改变
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
+    ...mapGetters([ // 这里是数组,中括号,不是大括号
+      'fullScreen',
+      'playlist',
+      'currentSong',
+      'playing', // 播放状态
+      'currentIndex'
+    ])
+  },
   methods: {
     back () {
       this.setFullScreen(false)
@@ -124,6 +142,26 @@ export default{
     togglePlaying () {
       this.setPlayingState(!this.playing)
     },
+    prev () {
+      let index = this.currentIndex - 1
+      if (index === -1) { // 如果是第一首, 就跳转到最后一首
+        index = this.playlist.length - 1
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) { // 当前歌曲暂停时,将切换后的歌曲playing改为false[所有歌曲初始化playing为ture]
+        this.togglePlaying()
+      }
+    },
+    next () {
+      let index = this.currentIndex + 1
+      if (index === this.playlist.length) { // 如果是最后一首, 就跳转到第一首
+        index = 0
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) { // 当前歌曲暂停时,将切换后的歌曲playing改为false[所有歌曲初始化playing为ture]
+        this.togglePlaying()
+      }
+    },
     _getPosAndScale () {
       const targetWidth = 40
       const paddingLeft = 40
@@ -141,25 +179,9 @@ export default{
     },
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
-      setPlayingState: 'SET_PLAYING_STATE'
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX'
     })
-  },
-  computed: {
-    cdCls () {
-      return this.playing ? 'play' : 'play pause'
-    },
-    playIcon () {
-      return this.playing ? 'icon-pause' : 'icon-play'
-    },
-    miniIcon () {
-      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
-    },
-    ...mapGetters([ // 这里是数组,中括号,不是大括号
-      'fullScreen',
-      'playlist',
-      'currentSong',
-      'playing' // 播放状态
-    ])
   },
   watch: {
     currentSong () {
