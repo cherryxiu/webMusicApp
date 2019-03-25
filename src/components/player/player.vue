@@ -32,7 +32,7 @@
         <div class="progress-wrapper">
           <span class="time time-l">{{format(currentTime)}}</span>
           <div class="progress-bar-wrapper">
-            <progress-bar></progress-bar>
+            <progress-bar :percent="percent"></progress-bar>
           </div>
           <span class="time time-r">{{format(currentSong.duration)}}</span>
         </div>
@@ -103,6 +103,9 @@ export default{
     },
     disableCls () { // 当domException时,按钮会暂时变灰,不能使用
       return this.songReady ? '' : 'disable'
+    },
+    percent () { // 计算歌曲播放比率
+      return this.currentTime / this.currentSong.duration
     },
     ...mapGetters([ // 这里是数组,中括号,不是大括号
       'fullScreen',
@@ -199,7 +202,7 @@ export default{
     format (interval) { // 将时间戳转换成 分:秒
       interval = interval | 0 // 取整
       const minite = interval / 60 | 0
-      const second = interval % 60
+      const second = this._pad(interval % 60)
       return `${minite}:${second}`
     },
     _getPosAndScale () {
@@ -216,6 +219,14 @@ export default{
         y,
         scale
       }
+    },
+    _pad (num, n = 2) {
+      let len = num.toString().length
+      while (len < n) {
+        num = '0' + num
+        len++
+      }
+      return num
     },
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',

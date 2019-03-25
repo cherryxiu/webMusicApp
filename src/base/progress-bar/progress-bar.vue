@@ -1,17 +1,35 @@
 <template>
-  <div class="progress-bar">
+  <div class="progress-bar" ref="progressBar">
     <div class="bar-inner">
-      <div class="progress"></div>
-      <div class="progress-btn-wrapper">
+      <div class="progress" ref="progress"></div>
+      <div class="progress-btn-wrapper" ref="progressBtn">
         <div class="progress-btn"></div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+import {prefixStyle} from 'common/js/dom'
+const transform = prefixStyle('transform')
+
+const progressBtnWidth = 16
 export default {
-  name: 'progress-bar'
+  name: 'progress-bar',
+  props: {
+    percent: { // 从父组件传来的percent
+      type: Number,
+      default: 0
+    }
+  },
+  watch: {
+    percent (newPercent) {
+      const progressBarWidth = this.$refs.progressBar.clientWidth - progressBtnWidth // 要扣除图标的宽度
+      const offsetWidth = newPercent * progressBarWidth // 进度条的偏移量
+      this.$refs.progress.style.width = `${offsetWidth}px` // 进度条高亮
+      this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)` // 图标需要根据播放进度移动
+    }
+  }
 }
 </script>
 
