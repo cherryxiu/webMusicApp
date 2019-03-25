@@ -29,6 +29,10 @@
         </div>
       </div>
       <div class="bottom">
+        <div class="progress-wrapper">
+          <span class="time time-l">{{format(currentTime)}}</span>
+          <span class="time time-r">{{format(currentSong.duration)}}</span>
+        </div>
         <div class="operators">
           <div class="icon i-left">
             <i class="icon-sequence"></i>
@@ -66,7 +70,7 @@
       </div>
     </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -79,7 +83,8 @@ const transform = prefixStyle('transform')
 export default{
   data () {
     return {
-      songReady: false
+      songReady: false,
+      currentTime: 0 // 歌曲播放到的时间
     }
   },
   computed: {
@@ -183,6 +188,15 @@ export default{
     },
     error () {
       this.songReady = true
+    },
+    updateTime (e) {
+      this.currentTime = e.target.currentTime
+    },
+    format (interval) { // 将时间戳转换成 分:秒
+      interval = interval | 0 // 取整
+      const minite = interval / 60 | 0
+      const second = interval % 60
+      return `${minite}:${second}`
     },
     _getPosAndScale () {
       const targetWidth = 40
