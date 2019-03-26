@@ -65,7 +65,8 @@
         <h2 class="name" v-html="currentSong.name"></h2>
         <p class="desc" v-html="currentSong.singer"></p>
       </div>
-      <div class="control">                                                                             <progress-circle radius="32" :percent="percent">
+      <div class="control">
+        <progress-circle :radius="radius" :percent="percent">
           <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
         </progress-circle>
       </div>
@@ -90,7 +91,8 @@ export default{
   data () {
     return {
       songReady: false,
-      currentTime: 0 // 歌曲播放到的时间
+      currentTime: 0, // 歌曲播放到的时间
+      radius: 32 // 避免type check failed [若直接用`radius=32传递,组件会将32变成string型,子组件props接收时会异常`]
     }
   },
   computed: {
