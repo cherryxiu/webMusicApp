@@ -1,5 +1,5 @@
 <template>
-  <div class="progress-bar" ref="progressBar">
+  <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
       <!-- .prevent - 调用 event.preventDefault() 即取消事件的默认动作。手机浏览器可能有自带滚动功能-->
@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     progressTouchStart (e) {
-      this.touch.initiated = true //  v初始化touch对象
+      this.touch.initiated = true //  初始化touch对象
       this.touch.startX = e.touches[0].pageX
       this.touch.left = this.$refs.progress.clientWidth // 滑动开始时进度条的偏移量
     },
@@ -47,7 +47,11 @@ export default {
       this.touch.initiated = false
       this._triggerPercent()
     },
-    _triggerPercent () {
+    progressClick (e) {
+      this._offset(e.offsetX)
+      this._triggerPercent()
+    },
+    _triggerPercent () { // 修改音乐的播放进程
       const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
       const percent = this.$refs.progress.clientWidth / barWidth // 滑动后的新percent, 调整歌曲播放的进度
       this.$emit('percentChange', percent)
