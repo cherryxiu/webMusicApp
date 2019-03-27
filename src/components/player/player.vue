@@ -86,6 +86,7 @@ import {prefixStyle} from 'common/js/dom'
 import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
 import {playMode} from 'common/js/config'
+import {shuffle} from 'common/js/util'
 const transform = prefixStyle('transform')
 export default{
   data () {
@@ -120,7 +121,8 @@ export default{
       'currentSong',
       'playing', // 播放状态
       'currentIndex',
-      'mode'
+      'mode',
+      'sequenceList'
     ])
   },
   methods: {
@@ -220,6 +222,22 @@ export default{
     changeMode () {
       const mode = (this.mode + 1) % 3
       this.setPlayMode(mode)
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList) // 将歌曲变成随机列表
+        this.setSequenceList(list)
+        this.setPlayList(list)
+        this.resetCurrentIndex(list)
+      } else {
+        list = this.sequenceList
+      }
+    },
+    resetCurrentIndex (list) { // 保持当前播放歌曲不变
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      console.log('index==' + index)
+      this.setCurrentIndex(index)
     },
     _getPosAndScale () {
       const targetWidth = 40
@@ -248,7 +266,9 @@ export default{
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
-      setPlayMode: 'SET_PLAY_MODE'
+      setPlayMode: 'SET_PLAY_MODE',
+      setSequenceList: 'SET_SEQUENCE_LIST',
+      setPlayList: 'SET_PLAYLIST'
     })
   },
   watch: {
