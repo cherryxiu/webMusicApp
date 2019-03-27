@@ -226,8 +226,8 @@ export default{
       if (mode === playMode.random) {
         list = shuffle(this.sequenceList) // 将歌曲变成随机列表
         this.setSequenceList(list)
-        this.setPlayList(list)
         this.resetCurrentIndex(list)
+        this.setPlayList(list)
       } else {
         list = this.sequenceList
       }
