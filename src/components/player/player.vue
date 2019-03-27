@@ -218,11 +218,8 @@ export default{
       this.$refs.audio.currentTime = currentTime // 根据滑动改变音乐播放
     },
     changeMode () {
-      if (this.mode === 2) {
-        this.setPlayMode(0)
-      } else {
-        this.setPlayMode(this.mode + 1)
-      }
+      const mode = (this.mode + 1) % 3
+      this.setPlayMode(mode)
     },
     _getPosAndScale () {
       const targetWidth = 40
