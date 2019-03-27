@@ -226,17 +226,16 @@ export default{
       if (mode === playMode.random) {
         list = shuffle(this.sequenceList) // 将歌曲变成随机列表
         this.setSequenceList(list)
-        this.resetCurrentIndex(list)
-        this.setPlayList(list)
       } else {
         list = this.sequenceList
       }
+      this.resetCurrentIndex(list)
+      this.setPlayList(list)
     },
     resetCurrentIndex (list) { // 保持当前播放歌曲不变
       let index = list.findIndex((item) => {
         return item.id === this.currentSong.id
       })
-      console.log('index==' + index)
       this.setCurrentIndex(index)
     },
     _getPosAndScale () {
@@ -272,7 +271,10 @@ export default{
     })
   },
   watch: {
-    currentSong () {
+    currentSong (newSong, oldSong) {
+      if (newSong.id === oldSong.id) { // 当歌曲暂停播放,切换随机模式时,仍然播放[因为虽然歌曲id没变,但currenSong是改变了的]
+        return
+      }
       this.$nextTick(() => {
         this.$refs.audio.play()
       })
