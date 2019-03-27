@@ -38,7 +38,7 @@
         </div>
         <div class="operators">
           <div class="icon i-left">
-            <i class="icon-sequence"></i>
+            <i :class="iconMode" @click="changeMode"></i>
           </div>
           <div class="icon i-left" :class="disableCls">
             <i @click="prev" class="icon-prev"></i>
@@ -85,7 +85,7 @@ import animations from 'create-keyframe-animation'
 import {prefixStyle} from 'common/js/dom'
 import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
-
+import {playMode} from 'common/js/config'
 const transform = prefixStyle('transform')
 export default{
   data () {
@@ -111,12 +111,16 @@ export default{
     percent () { // 计算歌曲播放比率
       return this.currentTime / this.currentSong.duration
     },
+    iconMode () { // 播放模式
+      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+    },
     ...mapGetters([ // 这里是数组,中括号,不是大括号
       'fullScreen',
       'playlist',
       'currentSong',
       'playing', // 播放状态
-      'currentIndex'
+      'currentIndex',
+      'mode'
     ])
   },
   methods: {
@@ -213,6 +217,13 @@ export default{
       const currentTime = this.currentSong.duration * newPercent
       this.$refs.audio.currentTime = currentTime // 根据滑动改变音乐播放
     },
+    changeMode () {
+      if (this.mode === 2) {
+        this.setPlayMode(0)
+      } else {
+        this.setPlayMode(this.mode + 1)
+      }
+    },
     _getPosAndScale () {
       const targetWidth = 40
       const paddingLeft = 40
@@ -239,7 +250,8 @@ export default{
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE'
     })
   },
   watch: {
