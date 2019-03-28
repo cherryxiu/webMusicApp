@@ -32,11 +32,15 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue', '.json','.styl'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
-      'common': resolve('src/common')
+      'common': resolve('src/common'),
+      'components': resolve('src/components'),
+      'router': resolve('src/router'),
+      'api': resolve('src/api'),
+      'base': resolve('src/base')
     }
   },
   module: {
@@ -75,6 +79,11 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
+      },
+     {
+        test: /\.styl$/,
+        loader: 'style-loader!css-loader!stylus-loader',
+        include: [] //必须加include：[]
       }
     ]
   },
