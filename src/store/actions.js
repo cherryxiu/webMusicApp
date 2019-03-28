@@ -22,6 +22,7 @@ export const selectPlay = function ({commit, state}, {list, index}) { // 选择�
   commit(types.SET_PLAYING_STATE, true)
 }
 
+// music-list的随机播放按钮
 export const randomPlay = function ({commit}, {list}) {
   commit(types.SET_PLAY_MODE, playMode.random)
   commit(types.SET_SEQUENCE_LIST, list)
