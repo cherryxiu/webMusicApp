@@ -3,7 +3,7 @@ function getRandomInt (min, max) { // 落在min和max之间返回,并且可以�
 }
 
 export function shuffle (arr) { // 随机播放的list
-  let _arr = arr.slice()
+  let _arr = arr.slice() // 取arr的副本, 避免直接修改arr
   for (let i = 0; i < _arr.length; i++) {
     let j = getRandomInt(0, i)
     let t = _arr[i]
