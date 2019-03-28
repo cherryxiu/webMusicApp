@@ -287,6 +287,11 @@ export default{
       }
       this.$nextTick(() => {
         this.$refs.audio.play()
+        this.currentSong.getLyric().then((lyric) => {
+          console.log(lyric)
+        }).catch(() => {
+
+        })
       })
     },
     playing (newPlaying) { // 监听playing播放状态来控制音乐是否播放
