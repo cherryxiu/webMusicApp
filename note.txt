@@ -1,0 +1,1 @@
+player.vue 模块没有路由切换, 直接引用到app.vue上,它的显示是依靠计算playlist.length是否大于0,
