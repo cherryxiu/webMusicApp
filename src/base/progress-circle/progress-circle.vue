@@ -28,7 +28,7 @@ export default {
   },
   computed: { // 计算属性
     dashoffset () {
-      return (1 - this.percent) * this.dashArray
+      return (1 - this.percent) * this.dashArray // 偏移量是让图案往前移的
     }
   }
 }

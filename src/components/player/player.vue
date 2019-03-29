@@ -87,13 +87,15 @@ import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
+import Lyric from 'lyric-parser'
 const transform = prefixStyle('transform')
 export default{
   data () {
     return {
       songReady: false,
       currentTime: 0, // 歌曲播放到的时间
-      radius: 32 // 避免type check failed [若直接用`radius=32传递,组件会将32变成string型,子组件props接收时会异常`]
+      radius: 32, // 避免type check failed [若直接用`radius=32传递,组件会将32变成string型,子组件props接收时会异常`]
+      currentLyric: null
     }
   },
   computed: {
@@ -248,6 +250,14 @@ export default{
     loop () { // 单曲循环就是将currentTime设置为0
       this.$refs.audio.currentTime = 0
     },
+    getLyric () {
+      this.currentSong.getLyric().then((lyric) => { // 获取歌词
+        console.log(new Lyric(lyric))
+        this.currentLyric = new Lyric(lyric) // 利用lyric-parser将lyric解析成Lyric对象
+      }).catch(() => {
+
+      })
+    },
     _getPosAndScale () {
       const targetWidth = 40
       const paddingLeft = 40
@@ -287,11 +297,7 @@ export default{
       }
       this.$nextTick(() => {
         this.$refs.audio.play()
-        this.currentSong.getLyric().then((lyric) => {
-          console.log(lyric)
-        }).catch(() => {
-
-        })
+        this.getLyric()
       })
     },
     playing (newPlaying) { // 监听playing播放状态来控制音乐是否播放

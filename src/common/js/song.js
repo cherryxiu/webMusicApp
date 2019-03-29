@@ -14,17 +14,17 @@ export default class Song {
     this.url = url
   }
   getLyric () {
-    if (this.lyric) {
+    if (this.lyric) { // 如果已经有
       return Promise.resolve(this.lyric)
     }
 
     return new Promise((resolve, reject) => {
       getLyric(this.mid).then((res) => {
         if (res.retcode === ERR_OK) {
-          this.lyric = Base64.decode(res.lyric)
+          this.lyric = Base64.decode(res.lyric) // 将歌词用base64解码
           resolve(this.lyric)
         } else {
-          // reject('no lyric')
+          reject(new Error('no lyric')) // reject('no lyric')不可以 ,需要传入的是一个Error对象
         }
       })
     })
