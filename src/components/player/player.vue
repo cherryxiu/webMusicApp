@@ -27,6 +27,14 @@
             <div class="playing-lyric"></div>
           </div>
         </div>
+        <!-- 显示全部歌词 -->
+        <div class="middle-r">
+          <div class="lyric-wrapper">
+            <div v-if="currentLyric">
+              <p class="text" v-for="(line, index) in currentLyric.lines" v-bind:key="index">{{line.txt}}</p>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="bottom">
         <div class="progress-wrapper">
@@ -95,7 +103,8 @@ export default{
       songReady: false,
       currentTime: 0, // 歌曲播放到的时间
       radius: 32, // 避免type check failed [若直接用`radius=32传递,组件会将32变成string型,子组件props接收时会异常`]
-      currentLyric: null
+      currentLyric: null,
+      currentLineNum: 0
     }
   },
   computed: {
@@ -253,10 +262,14 @@ export default{
     getLyric () {
       this.currentSong.getLyric().then((lyric) => { // 获取歌词
         console.log(new Lyric(lyric))
-        this.currentLyric = new Lyric(lyric) // 利用lyric-parser将lyric解析成Lyric对象
+        this.currentLyric = new Lyric(lyric, this.handleLyric) // 利用lyric-parser将lyric解析成Lyric对象
+        this.currentLyric.play()
       }).catch(() => {
 
       })
+    },
+    handleLyric ({lineNum, txt}) {
+      this.currentLineNum = lineNum
     },
     _getPosAndScale () {
       const targetWidth = 40
