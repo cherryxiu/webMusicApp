@@ -28,7 +28,8 @@
           </div>
         </div>
         <!-- 显示全部歌词 -->
-        <div class="middle-r">
+        <!--:data="currentLyric && currentLyric.lines"先判断currentLyric是否为null,不为空则取lines-->
+        <scroll class="middle-r" :data="currentLyric && currentLyric.lines">
           <div class="lyric-wrapper">
             <div v-if="currentLyric">
               <p class="text"
@@ -36,7 +37,7 @@
                  v-for="(line, index) in currentLyric.lines" v-bind:key="index">{{line.txt}}</p>
             </div>
           </div>
-        </div>
+        </scroll>
       </div>
       <div class="bottom">
         <div class="progress-wrapper">
@@ -98,6 +99,7 @@ import ProgressCircle from 'base/progress-circle/progress-circle'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
 import Lyric from 'lyric-parser'
+import Scroll from 'base/scroll/scroll'
 const transform = prefixStyle('transform')
 export default{
   data () {
@@ -324,7 +326,8 @@ export default{
   },
   components: {
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Scroll
   }
 }
 </script>
