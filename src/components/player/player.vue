@@ -31,7 +31,9 @@
         <div class="middle-r">
           <div class="lyric-wrapper">
             <div v-if="currentLyric">
-              <p class="text" v-for="(line, index) in currentLyric.lines" v-bind:key="index">{{line.txt}}</p>
+              <p class="text"
+                 :class="{'current':currentLineNum === index}"
+                 v-for="(line, index) in currentLyric.lines" v-bind:key="index">{{line.txt}}</p>
             </div>
           </div>
         </div>
