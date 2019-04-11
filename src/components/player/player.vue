@@ -28,11 +28,13 @@
           </div>
         </div>
         <!-- 显示全部歌词 -->
-        <!--:data="currentLyric && currentLyric.lines"先判断currentLyric是否为null,不为空则取lines-->
-        <scroll class="middle-r" :data="currentLyric && currentLyric.lines">
+        <!-- :data 先判断currentLyric是否为null,不为空则取lines -->
+        <scroll class="currentLineNum === index" ref="lyricList" :data="currentLyric && currentLyric.lines">
           <div class="lyric-wrapper">
             <div v-if="currentLyric">
-              <p class="text"
+              <!-- :class 布尔值的绑定方式,"currentLineNum===index"为true时才增加 current 样式-->
+              <p ref="lyricLine"
+                 class="text"
                  :class="{'current':currentLineNum === index}"
                  v-for="(line, index) in currentLyric.lines" v-bind:key="index">{{line.txt}}</p>
             </div>
@@ -274,6 +276,12 @@ export default{
     },
     handleLyric ({lineNum, txt}) {
       this.currentLineNum = lineNum
+      if (lineNum > 4) { // 歌词滚动高亮
+        let lineEl = this.$refs.lyricLine[lineNum - 4]
+        this.$refs.lyricList.scrollToElement(lineEl, 1000)
+      } else {
+        this.$refs.lyricList.scrollTo(0, 0, 1000)
+      }
     },
     _getPosAndScale () {
       const targetWidth = 40
