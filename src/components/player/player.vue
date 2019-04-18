@@ -16,8 +16,11 @@
         <h1 class="title" v-html="currentSong.name"></h1>
         <h2 class="subtitle" v-html="currentSong.singer"></h2>
       </div>
-      <div class="middle">
-        <div class="middle-l">
+      <div class="middle"
+           @touchstart.prevent="middleTouchStart"
+           @touchmove.prevent="middleTouchMove"
+           @touchend.prevent="middleTouchEnd">
+        <div class="middle-l" ref="middleL">
           <div class="cd-wrapper" ref="cdWrapper">
             <div class="cd" :class="cdCls">
               <img class="image" :src="currentSong.image">
@@ -29,7 +32,7 @@
         </div>
         <!-- 显示全部歌词 -->
         <!-- :data 先判断currentLyric是否为null,不为空则取lines -->
-        <scroll class="currentLineNum === index" ref="lyricList" :data="currentLyric && currentLyric.lines">
+        <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
           <div class="lyric-wrapper">
             <div v-if="currentLyric">
               <!-- :class 布尔值的绑定方式,"currentLineNum===index"为true时才增加 current 样式-->
@@ -42,6 +45,10 @@
         </scroll>
       </div>
       <div class="bottom">
+        <div class="dot-wrapper">
+          <span class="dot" :class="{'active':currentShow === 'cd'}"></span>
+          <span class="dot" :class="{'active':currentShow === 'lyric'}"></span>
+        </div>
         <div class="progress-wrapper">
           <span class="time time-l">{{format(currentTime)}}</span>
           <div class="progress-bar-wrapper">
@@ -110,7 +117,8 @@ export default{
       currentTime: 0, // 歌曲播放到的时间
       radius: 32, // 避免type check failed [若直接用`radius=32传递,组件会将32变成string型,子组件props接收时会异常`]
       currentLyric: null,
-      currentLineNum: 0
+      currentLineNum: 0,
+      currentShow: 'cd'
     }
   },
   computed: {
@@ -141,6 +149,9 @@ export default{
       'mode',
       'sequenceList'
     ])
+  },
+  created () {
+    this.touch = {} // 初始化touch对象
   },
   methods: {
     back () {
@@ -276,12 +287,58 @@ export default{
     },
     handleLyric ({lineNum, txt}) {
       this.currentLineNum = lineNum
-      if (lineNum > 4) { // 歌词滚动高亮
-        let lineEl = this.$refs.lyricLine[lineNum - 4]
+      if (lineNum > 5) { // 歌词滚动高亮
+        let lineEl = this.$refs.lyricLine[lineNum - 5]
         this.$refs.lyricList.scrollToElement(lineEl, 1000)
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
+    },
+    middleTouchStart (e) {
+      this.touch.initiated = true
+      const touch = e.touches[0]
+      this.touch.startX = touch.pageX
+      this.touch.startY = touch.pageY
+    },
+    middleTouchMove (e) {
+      if (!this.touch.initiated) {
+        return
+      }
+      const touch = e.touches[0]
+      const deltaX = touch.pageX - this.touch.startX
+      const deltaY = touch.pageY - this.touch.startY
+      if (Math.abs(deltaX) < Math.abs(deltaY)) { // 歌词有个纵向scroll, 所以如果Y向移动大于X向移动,则return
+        return
+      }
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth // 指的应该是middle-r的左边,控制middle-r模块
+      const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX)) // 页面显示的lyric所占距离
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth) // 页面显示lyric所占比例
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+    },
+    middleTouchEnd (e) {
+      let offsetWidth // 控制middle-r的偏移
+      let opacity // 控制middle-l的透明度
+      if (this.currentShow === 'cd') {
+        if (this.touch.percent > 0.1) { // 切换页面到lyric
+          offsetWidth = -window.innerWidth
+          opacity = 0
+          this.currentShow = 'lyric'
+        } else {
+          offsetWidth = 0
+          opacity = 1
+        }
+      } else {
+        if (this.touch.percent < 0.9) { // 切换页面到cd
+          offsetWidth = 0
+          opacity = 1
+          this.currentShow = 'cd'
+        } else {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+        }
+      }
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+      this.$refs.middleL.style.opacity = opacity
     },
     _getPosAndScale () {
       const targetWidth = 40
