@@ -110,6 +110,7 @@ import {shuffle} from 'common/js/util'
 import Lyric from 'lyric-parser'
 import Scroll from 'base/scroll/scroll'
 const transform = prefixStyle('transform')
+const transitionDuration = prefixStyle('transitionDuration')
 export default{
   data () {
     return {
@@ -314,6 +315,9 @@ export default{
       const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX)) // 页面显示的lyric所占距离
       this.touch.percent = Math.abs(offsetWidth / window.innerWidth) // 页面显示lyric所占比例
       this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+      this.$refs.lyricList.$el.style[transitionDuration] = 0 // 过渡所需时间
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent // lyric页面显示越多, middleL越暗淡
+      this.$refs.middleL.style[transitionDuration] = 0
     },
     middleTouchEnd (e) {
       let offsetWidth // 控制middle-r的偏移
@@ -337,8 +341,10 @@ export default{
           opacity = 0
         }
       }
+      const time = 300
       this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
       this.$refs.middleL.style.opacity = opacity
+      this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
     },
     _getPosAndScale () {
       const targetWidth = 40
