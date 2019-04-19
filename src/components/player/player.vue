@@ -27,7 +27,7 @@
             </div>
           </div>
           <div class="playing-lyric-wrapper">
-            <div class="playing-lyric"></div>
+            <div class="playing-lyric">{{playingLyric}}</div>
           </div>
         </div>
         <!-- 显示全部歌词 -->
@@ -119,7 +119,8 @@ export default{
       radius: 32, // 避免type check failed [若直接用`radius=32传递,组件会将32变成string型,子组件props接收时会异常`]
       currentLyric: null,
       currentLineNum: 0,
-      currentShow: 'cd'
+      currentShow: 'cd',
+      playingLyric: ''
     }
   },
   computed: {
@@ -148,7 +149,7 @@ export default{
       'playing', // 播放状态
       'currentIndex',
       'mode',
-      'sequenceList'
+      'sequenceList' // 在cd页面显示的歌词
     ])
   },
   created () {
@@ -199,19 +200,29 @@ export default{
       this.$refs.cdWrapper.style[transform] = ''
     },
     togglePlaying () {
+      if (!this.songReady) {
+        return
+      }
       this.setPlayingState(!this.playing)
+      if (this.currentLyric) { // 解决暂停播放时, 歌词继续滚动问题
+        this.currentLyric.togglePlay()
+      }
     },
     prev () {
       if (!this.songReady) { // 切换还没准备好.songReady该没被改成true,避免DOMException
         return
       }
-      let index = this.currentIndex - 1
-      if (index === -1) { // 如果是第一首, 就跳转到最后一首
-        index = this.playlist.length - 1
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) { // 当前歌曲暂停时,将切换后的歌曲playing重新改为true,使跳转后的歌曲icon改为play[因为跳转后的歌曲自动播放]
-        this.togglePlaying()
+      if (this.playlist.length === 1) { // 防止特殊情况发生
+        this.loop()
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) { // 如果是第一首, 就跳转到最后一首
+          index = this.playlist.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) { // 当前歌曲暂停时,将切换后的歌曲playing重新改为true,使跳转后的歌曲icon改为play[因为跳转后的歌曲自动播放]
+          this.togglePlaying()
+        }
       }
       this.songReady = false // 完成之后恢复数据初始
     },
@@ -219,13 +230,17 @@ export default{
       if (!this.songReady) { // 上同,避免DOMException
         return
       }
-      let index = this.currentIndex + 1
-      if (index === this.playlist.length) { // 如果是最后一首, 就跳转到第一首
-        index = 0
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) { // 上同,使跳转后的歌曲icon改为play
-        this.togglePlaying()
+      if (this.playlist.length === 1) { // 防止特殊情况发生
+        this.loop()
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playlist.length) { // 如果是最后一首, 就跳转到第一首
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) { // 上同,使跳转后的歌曲icon改为play
+          this.togglePlaying()
+        }
       }
       this.songReady = false // 完成之后恢复数据初始
     },
@@ -247,6 +262,12 @@ export default{
     onProgressBarChange (newPercent) {
       const currentTime = this.currentSong.duration * newPercent
       this.$refs.audio.currentTime = currentTime // 根据滑动改变音乐播放
+      if (!this.playing) { // 在暂停时点击进度条, 使歌曲保播放状态
+        this.togglePlaying()
+      }
+      if (this.currentLyric) { // 滑动进度条时, 歌词高亮也随之变动
+        this.currentLyric.seek(currentTime * 1000)
+      }
     },
     changeMode () {
       const mode = (this.mode + 1) % 3
@@ -274,8 +295,12 @@ export default{
         this.next()
       }
     },
-    loop () { // 单曲循环就是将currentTime设置为0
-      this.$refs.audio.currentTime = 0
+    loop () {
+      this.$refs.audio.currentTime = 0 // 单曲循环就是将currentTime设置为0
+      this.$refs.audio.play() // 循环时继续播放
+      if (this.currentLyric) { // 播放结束时,将歌词播放重置
+        this.currentLyric.seek(0)
+      }
     },
     getLyric () {
       this.currentSong.getLyric().then((lyric) => { // 获取歌词
@@ -283,7 +308,9 @@ export default{
         this.currentLyric = new Lyric(lyric, this.handleLyric) // 利用lyric-parser将lyric解析成Lyric对象
         this.currentLyric.play()
       }).catch(() => {
-
+        this.currentLyric = null
+        this.playingLyric = ''
+        this.currentLineNum = 0
       })
     },
     handleLyric ({lineNum, txt}) {
@@ -294,6 +321,7 @@ export default{
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
+      this.playingLyric = txt
     },
     middleTouchStart (e) {
       this.touch.initiated = true
@@ -383,10 +411,13 @@ export default{
       if (newSong.id === oldSong.id) { // 当歌曲暂停播放,切换随机模式时,仍然播放[因为虽然歌曲id没变,但currenSong是改变了的]
         return
       }
-      this.$nextTick(() => {
+      if (this.currentLyric) { // 切换歌曲时,在或许新的lyric之前,清除当前歌曲的计时器
+        this.currentLyric.stop()
+      }
+      setTimeout(() => { // 保证歌曲从后台切换到浏览器时,能正常播放
         this.$refs.audio.play()
         this.getLyric()
-      })
+      }, 1000)
     },
     playing (newPlaying) { // 监听playing播放状态来控制音乐是否播放
       const audio = this.$refs.audio
