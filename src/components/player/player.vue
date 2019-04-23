@@ -342,7 +342,8 @@ export default{
       const left = this.currentShow === 'cd' ? 0 : -window.innerWidth // 指的应该是middle-r的左边,控制middle-r模块
       const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX)) // 页面显示的lyric所占距离
       this.touch.percent = Math.abs(offsetWidth / window.innerWidth) // 页面显示lyric所占比例
-      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)` // $el 是要取到它的元素      this.$refs.lyricList.$el.style[transitionDuration] = 0 // 过渡所需时间
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)` // $el 是要取到它的元素
+      this.$refs.lyricList.$el.style[transitionDuration] = 0 // 过渡所需时间
       this.$refs.middleL.style.opacity = 1 - this.touch.percent // lyric页面显示越多, middleL越暗淡
       this.$refs.middleL.style[transitionDuration] = 0
     },
@@ -370,8 +371,10 @@ export default{
       }
       const time = 300
       this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
-      this.$refs.middleL.style.opacity = opacity
       this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
+      this.$refs.middleL.style.opacity = opacity
+      this.$refs.middleL.style[transitionDuration] = `${time}ms`
+      this.touch.initiated = false
     },
     _getPosAndScale () {
       const targetWidth = 40
