@@ -1,5 +1,5 @@
 <template>
-<div class="music-list">
+<div class="music-list" ref="singer">
   <div class="back" @click="back">
     <i class="icon-back"></i>
   </div>
@@ -31,6 +31,7 @@ import Scroll from 'base/scroll/scroll'
 import {prefixStyle} from 'common/js/dom'
 import Loading from '../../base/loading/loading'
 import {mapActions} from 'vuex'
+import {playlistMixin} from 'common/js/mixin'
 
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
@@ -38,6 +39,7 @@ const backdrop = prefixStyle('backdrop-filter')
 
 export default{
   name: 'music-list',
+  mixins: {playlistMixin},
   props: {// 子组件使用父组件的数据，需要通过子组件的 props 选项
     bgImage: {
       type: String,
@@ -72,6 +74,11 @@ export default{
     this.$refs.list.$el.style.top = `${this.imageHeight}px`// list列表的初始化高度
   },
   methods: {
+    handlePlaylist (playlist) {
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.list.$el.style.bottom = bottom
+      this.$refs.list.refresh()
+    },
     scroll (pos) { // 获取song-list滑动的距离
       this.scrollY = pos.y
     },
