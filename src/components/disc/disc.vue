@@ -1,6 +1,6 @@
 <template>
   <transition name="slide">
-    <music-list :title="title" :bg-image="bgImage"></music-list>
+    <music-list :title="title" :bg-image="bgImage" :songs="songs"></music-list>
   </transition>
 </template>
 <script>
@@ -8,12 +8,17 @@ import MusicList from 'components/music-list/music-list'
 import {mapGetters} from 'vuex'
 
 export default {
+  data () {
+    return {
+      songs: []
+    }
+  },
   computed: {
     title () { // 加几个计算属性
       return this.disc.dissname
     },
     bgImage () {
-      return this.disc.imgUrl
+      return this.disc.imgurl
     },
     ...mapGetters([
       'disc' // mutation的数据传递  对应到getters.js的disc
