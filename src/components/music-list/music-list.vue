@@ -18,7 +18,7 @@
     <div class="song-list-wrapper">
       <song-list :songs="songs" @select="selectItem"></song-list>
     </div>
-    <div v-show="!songs.length" class="loading-wrapper">
+    <div v-show="!songs.length" class="loading-container">
       <loading></loading>
     </div>
   </scroll>
