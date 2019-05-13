@@ -6,6 +6,8 @@
 <script>
 import MusicList from 'components/music-list/music-list'
 import {mapGetters} from 'vuex'
+import {getSongList} from 'api/recommend'
+import {ERR_OK} from 'api/config'
 
 export default {
   data () {
@@ -25,7 +27,20 @@ export default {
     ])
   },
   created () {
-    console.log('跳转的为=======' + JSON.stringify(this.disc))
+    this._getSongList()
+  },
+  methods: {
+    _getSongList () {
+      if (!this.disc.dissid) {
+        this.$router.push('/recommend')
+        return
+      }
+      getSongList(this.disc.dissid).then((res) => {
+        if (res.code === ERR_OK) {
+          console.log('展示歌单' + JSON.stringify(res.cdlist))
+        }
+      })
+    }
   },
   components: {
     MusicList
