@@ -8,6 +8,7 @@ import MusicList from 'components/music-list/music-list'
 import {mapGetters} from 'vuex'
 import {getSongList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
+import {createSong} from '../../common/js/song'
 
 export default {
   data () {
@@ -37,9 +38,18 @@ export default {
       }
       getSongList(this.disc.dissid).then((res) => {
         if (res.code === ERR_OK) {
-          console.log('展示歌单' + JSON.stringify(res.cdlist))
+          this.songs = this._normalizeSongs(res.cdlist[0].songlist)
         }
       })
+    },
+    _normalizeSongs (list) {
+      let ret = []
+      list.forEach((musicData) => {
+        if (musicData.songid && musicData.albummid) {
+          ret.push(createSong(musicData))
+        }
+      })
+      return ret
     }
   },
   components: {
