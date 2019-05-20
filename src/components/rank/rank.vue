@@ -1,10 +1,29 @@
 <template>
   <div class="rank">
+    <ul>
+      <li>
+        <div class="icon">
+          <img width="100" height="100"/>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
-export default {}
+import {getTopList} from 'api/rank'
+export default {
+  created () {
+    this._getTopList()
+  },
+  methods: {
+    _getTopList () {
+      getTopList().then((res) => {
+        console.log('topList为' + JSON.stringify(res))
+      })
+    }
+  }
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
