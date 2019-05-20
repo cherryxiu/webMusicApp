@@ -9,12 +9,9 @@ export function getTopList () { // 获取"排行"列表
     uin: 0,
     needNewCode: 1,
     platform: 'h5',
-    notice: 0,
     g_tk: 5381,
     _: 1558087958875,
-    format: 'json',
-    inCharset: 'utf-8',
-    outCharset: 'utf-8'
+    format: 'json'
   })
   // return jsonp(url, data, options)
   return axios.get(url, {

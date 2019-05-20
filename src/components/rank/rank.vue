@@ -1,10 +1,16 @@
 <template>
   <div class="rank">
-    <ul>
-      <li>
+    <ul class="toplist">
+      <li  class="item" v-if="topList" v-for="(item, index) in topList" v-bind:key="index">
         <div class="icon">
-          <img width="100" height="100"/>
+          <img width="100" height="100" :src="item.picUrl"/>
         </div>
+        <ul class="songlist">
+          <li class="song" v-for="(song, index) in item.songList" v-bind:key="index">
+            <span>{{ index + 1 }}</span>
+            <span>{{song.songname}} - {{song.singername}}</span>
+          </li>
+        </ul>
       </li>
     </ul>
   </div>
@@ -12,14 +18,24 @@
 
 <script>
 import {getTopList} from 'api/rank'
+import {ERR_OK} from 'api/config'
 export default {
+  data () {
+    return {
+      topList: []
+    }
+  },
   created () {
     this._getTopList()
   },
   methods: {
     _getTopList () {
       getTopList().then((res) => {
-        console.log('topList为' + JSON.stringify(res))
+        if (res.code === ERR_OK) {
+          // console.log('topList为' + JSON.stringify(res))*/
+          this.topList = res.data.topList
+          console.log('topList=' + JSON.stringify(this.topList))
+        }
       })
     }
   }
@@ -59,7 +75,7 @@ export default {
           overflow: hidden
           background: $color-highlight-background
           color: $color-text-d
-          font-size: $font-size-small
+          font-size: $font-size-medium
           .song
             no-wrap()
             line-height: 26px
