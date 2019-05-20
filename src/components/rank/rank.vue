@@ -1,9 +1,10 @@
 <template>
-  <div class="rank">
-    <ul class="toplist">
-      <li  class="item" v-if="topList" v-for="(item, index) in topList" v-bind:key="index">
+  <div class="rank" ref="rank">
+    <scroll :data="topList" class="toplist" ref="toplist">
+    <ul>
+      <li  class="item" v-for="(item, index) in topList" v-bind:key="index">
         <div class="icon">
-          <img width="100" height="100" :src="item.picUrl"/>
+          <img width="100" height="100" v-lazy="item.picUrl"/>
         </div>
         <ul class="songlist">
           <li class="song" v-for="(song, index) in item.songList" v-bind:key="index">
@@ -13,22 +14,38 @@
         </ul>
       </li>
     </ul>
+    <div class="loading-container" v-show="!topList.length">
+      <loading></loading>
+    </div>
+    </scroll>
   </div>
 </template>
 
 <script>
 import {getTopList} from 'api/rank'
 import {ERR_OK} from 'api/config'
+import Scroll from 'base/scroll/scroll'
+import Loading from 'base/loading/loading'
+import {playlistMixin} from 'common/js/mixin'
 export default {
+  mixins: [playlistMixin],
   data () {
     return {
       topList: []
     }
   },
   created () {
-    this._getTopList()
+    setTimeout(() => {
+      this._getTopList()
+    }, 1000)
   },
   methods: {
+    handlePlaylist (playlist) { // 当有歌曲播放,并滑动到最低部时样式的优化
+      const bottom = playlist.length > 0 ? '60px' : ''
+
+      this.$refs.rank.style.bottom = bottom
+      this.$refs.toplist.refresh()
+    },
     _getTopList () {
       getTopList().then((res) => {
         if (res.code === ERR_OK) {
@@ -38,6 +55,10 @@ export default {
         }
       })
     }
+  },
+  components: {
+    Scroll,
+    Loading
   }
 }
 </script>
