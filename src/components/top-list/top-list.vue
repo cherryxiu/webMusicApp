@@ -9,33 +9,53 @@ import {getMusicList} from 'api/rank'
 import MusicList from '../music-list/music-list'
 import {mapGetters} from 'vuex'
 import {ERR_OK} from 'api/config'
+import {createSong} from 'common/js/song'
 
 export default {
+  data () {
+    return {
+      songs: []
+    }
+  },
   computed: {
     title () {
       return this.topList.topTitle
     },
     bgImage () {
-      return this.topList.picUrl
-    },
-    songs () {
-      return this.topList.songList
+      if (this.songs.length) {
+        return this.songs[0].image
+      }
+      return ''
     },
     ...mapGetters([
       'topList'
     ])
   },
   created () {
-    console.log('开始获取排行详情页')
     this._getMusicList()
   },
   methods: {
     _getMusicList () {
+      if (!this.topList.id) {
+        this.$router.push('/rank')
+        return
+      }
       getMusicList(this.topList.id).then((res) => {
         if (res.code === ERR_OK) {
-          console.log('详情页' + JSON.stringify(res))
+          this.songs = this._normalizeSongs(res.songlist)
         }
       })
+    },
+    _normalizeSongs (list) {
+      let ret = []
+      list.forEach((item) => {
+        // 不能使用对象的解构赋值 let {musicData} = item.data
+        const musicData = item.data
+        if (musicData.songid && musicData.albummid) {
+          ret.push(createSong(musicData))
+        }
+      })
+      return ret
     }
   },
   components: {
