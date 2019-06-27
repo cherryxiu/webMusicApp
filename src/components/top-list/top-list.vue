@@ -5,8 +5,10 @@
 </template>
 
 <script>
+import {getMusicList} from 'api/rank'
 import MusicList from '../music-list/music-list'
 import {mapGetters} from 'vuex'
+import {ERR_OK} from 'api/config'
 
 export default {
   computed: {
@@ -22,6 +24,19 @@ export default {
     ...mapGetters([
       'topList'
     ])
+  },
+  created () {
+    console.log('开始获取排行详情页')
+    this._getMusicList()
+  },
+  methods: {
+    _getMusicList () {
+      getMusicList(this.topList.id).then((res) => {
+        if (res.code === ERR_OK) {
+          console.log('详情页' + JSON.stringify(res))
+        }
+      })
+    }
   },
   components: {
     MusicList
