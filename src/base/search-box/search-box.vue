@@ -23,6 +23,9 @@ export default {
   methods: {
     clear () {
       this.query = ''
+    },
+    setQuery (query) { // 点击'热门搜索'的歌曲时,搜索框文案填充
+      this.query = query
     }
   },
   created () { // 派发一个query(将query的值暴露给外面)
